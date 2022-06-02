@@ -34,18 +34,21 @@ export default function Login() {
       .then((response) => {
         setLoginFailure(false);
 
-        localStorage.setItem("token", JSON.stringify(response.data));
         if (response.data[0] === "Applicant" && response.data[1] === true) {
-          setCookie(response.data[0], response.data[2]);
+          // setCookie(response.data[0], response.data[2]);
+          localStorage.setItem(response.data[0],response.data[2],{encrypt:true});
+
           nav("/ApplicantDash/AppHome", { state: { email: inputs.email } });
         } else if (
           response.data[0] === "Recruiter" &&
           response.data[1] === true
         ) {
-          setCookie(response.data[0], response.data[2]);
+          // setCookie(response.data[0], response.data[2]);
+          localStorage.setItem(response.data[0],response.data[2],{encrypt:true});
           nav("/RecruiterDash/RecHome", { state: { email: inputs.email } });
         } else if (response.data[0] === "Admin" && response.data[1] === true) {
-          setCookie(response.data[0], response.data[2]);
+          // setCookie(response.data[0], response.data[2]);
+          localStorage.setItem(response.data[0],response.data[2],{encrypt:true});
           nav("/AdminDash/AdminHome", { state: { email: inputs.email } });
         } else setLoginFailure(true);
         setFailureMsg("Login Failed");

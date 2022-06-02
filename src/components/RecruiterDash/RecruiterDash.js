@@ -31,8 +31,16 @@ export default function RecruiterDash() {
   const [sidebar, setSidebar] = useState(false);
   const showSidebar = () => setSidebar(!sidebar);
 
-  useEffect(() => {
-    const data = LoginService.getRecruiter()
+  useEffect(async () => {
+    function parseJwt(token) {
+      if (!token) { return; }
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace('-', '+').replace('_', '/');
+      return JSON.parse(window.atob(base64));
+  }
+  try{
+
+    const data = await LoginService.getRecruiter(parseJwt(localStorage.getItem('Recruiter'), { decrypt: true}).iss)
       .then((response) => {
         setRecruiterV({
           role: response.data["role"],
@@ -49,8 +57,13 @@ export default function RecruiterDash() {
         });
       })
       .catch((error) => {
+        
         navigate("/login");
       });
+  }
+  catch(error){
+    navigate("/login")
+  }
     return () => {};
   }, []);
 
