@@ -7,6 +7,7 @@ import { IconContext } from "react-icons";
 import "../ApplicantDash/AppDash.css";
 import { useCookies } from "react-cookie";
 import LoginService from "../../services/LoginService";
+import RecruiterService from "../../services/RecruiterService"
 
 export default function RecruiterDash() {
   document.title = "Recruiter";
@@ -31,7 +32,7 @@ export default function RecruiterDash() {
   const [sidebar, setSidebar] = useState(false);
   const showSidebar = () => setSidebar(!sidebar);
 
-  useEffect(async () => {
+  useEffect( () => {
     function parseJwt(token) {
       if (!token) { return; }
       const base64Url = token.split('.')[1];
@@ -40,7 +41,7 @@ export default function RecruiterDash() {
   }
   try{
 
-    const data = await LoginService.getRecruiter(parseJwt(localStorage.getItem('Recruiter'), { decrypt: true}).iss)
+    const data = RecruiterService.get(parseJwt(localStorage.getItem('Recruiter'), { decrypt: true}).iss)
       .then((response) => {
         setRecruiterV({
           role: response.data["role"],
@@ -131,7 +132,7 @@ export default function RecruiterDash() {
       type: "Recruiter",
     };
     LoginService.logout(logoutDTO).then((response) => {
-      removeCookie(logoutDTO.type);
+      // removeCookie(logoutDTO.type);
       localStorage.removeItem("token");
       navigate("/login");
     });
