@@ -6,6 +6,7 @@ import { IconContext } from "react-icons";
 import "../ApplicantDash/AppDash.css";
 import LoginService from "../../services/LoginService";
 import { useCookies } from "react-cookie";
+import AdminService from "../services/AdminService"
 
 export default function AdminDash() {
   const [cookie, setCookie, removeCookie] = useCookies();
@@ -21,7 +22,15 @@ export default function AdminDash() {
   const showSidebar = () => setSidebar(!sidebar);
 
   useEffect(() => {
-    const data = LoginService.getAdmin()
+    function parseJwt(token) {
+      if (!token) { return; }
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace('-', '+').replace('_', '/');
+      return JSON.parse(window.atob(base64));
+  }
+  try{
+
+    const data = AdminService.get(parseJwt(localStorage.getItem('Admin'), { decrypt: true}).iss)
       .then((response) => {
         setAdminV(response.data);
         if (response.data.adminEmail === "admin@jobhunt.com") {
@@ -40,6 +49,10 @@ export default function AdminDash() {
         setErrorMsg(error.response.data);
         navigate("/login")
       });
+    } catch{
+    navigate("/login")
+
+  }
 
     return () => {};
   }, []);
@@ -82,7 +95,7 @@ export default function AdminDash() {
       type: "Admin",
     };
     LoginService.logout(logoutDTO).then((response) => {
-      removeCookie(logoutDTO.type);
+      // removeCookie(logoutDTO.type);
       localStorage.removeItem("token");
       navigate("/login");
     });

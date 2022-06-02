@@ -14,6 +14,10 @@ class AdminService {
     return http.get("/admin/getMesgReceived")
   }
 
+  get(id){
+    return http.get(`/admin/${id}`)
+  }
+
   updateAdmin(admin){
     return http.put("/admin/updateAdmin",admin)
   }

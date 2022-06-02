@@ -21,7 +21,16 @@ export default function ApplicantDash() {
   const showSidebar = () => setSidebar(!sidebar);
 
   useEffect(() => {
-    const data = LoginService.getApplicant()
+    function parseJwt(token) {
+      if (!token) { return; }
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace('-', '+').replace('_', '/');
+      return JSON.parse(window.atob(base64));
+  }
+
+  try {
+
+    const data = ApplicantService.get(parseJwt(localStorage.getItem('Applicant'), { decrypt: true}).iss)
       .then((response) => {
 
         setApplicantV(response.data);
@@ -32,6 +41,9 @@ export default function ApplicantDash() {
 
         navigate("/login");
       });
+  }catch{
+    navigate("/login")
+  }
     return () => {};
   }, []);
 
@@ -85,7 +97,7 @@ export default function ApplicantDash() {
       type: "Applicant",
     };
     LoginService.logout(logoutDTO).then((response) => {
-      removeCookie(logoutDTO.type);
+      // removeCookie(logoutDTO.type);
       localStorage.removeItem("token");
       navigate("/login");
     });
