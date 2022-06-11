@@ -1,5 +1,7 @@
-#Deployed on hereku, you can visit the following link for demo
+# Deployed on hereku, you can visit the following link for demo
+
 https://frontend-jobhunt.herokuapp.com/
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
