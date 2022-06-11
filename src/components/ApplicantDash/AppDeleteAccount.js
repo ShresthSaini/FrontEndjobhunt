@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ApplicantService from "../services/ApplicantService";
+import ApplicantService from "../../services/ApplicantService";
 import ApplicantDash from "./ApplicantDash";
 
 export default function AppDeleteAccount() {

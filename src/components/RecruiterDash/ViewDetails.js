@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import RecruiterService from "../../services/RecruiterService";
 import RecruiterDash from "./RecruiterDash";
@@ -10,37 +10,37 @@ import {
   Typography,
 } from "@material-ui/core";
 import * as FcIcons from "react-icons/fc";
+import Spinner from "../Spinner";
 
 export default function ViewDetails() {
-  
+  const [loading, setLoading] = useState(false);
   const [isShow, setIsShow] = useState(false);
   const [acceptShow, setAcceptShow] = useState(false);
   const [show, setShow] = useState(true);
   const [showMesg, setShowMesg] = useState({});
-  const [message, setMessage] = useState("")
+  const [message, setMessage] = useState("");
   const [msg, setMsg] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const [myApplicants, setMyApplicants] = useState([]);
-  const [recruiter, setRecruiter] = useState()
-  const [recruiterEmail , setRecuiterEmail] = useState();
+  const [applicant, setApplicant] = useState([]);
+  const [recruiter, setRecruiter] = useState();
+  const [recruiterEmail, setRecuiterEmail] = useState();
   const [jobTitle, setJobTitle] = useState();
   const [jobId, setJobId] = useState();
-  
 
   useEffect(() => {
     setJobTitle(location.state.jobTitle);
-    setRecuiterEmail(location.state.recruiterEmail)
-    setJobId(location.state.jobId)
+    setRecuiterEmail(location.state.recruiterEmail);
+    setJobId(location.state.jobId);
     RecruiterService.getAppliedApplicants(location.state.jobId)
       .then((response) => {
-        if (response.data.length===0){
+        if (response.data.length === 0) {
           setIsShow(true);
-          setMsg("Applicant has not applied for this job")
+          setMsg("Applicant has not applied for this job");
         }
-        
+
         setMyApplicants(response.data);
-       
       })
       .catch((error) => {
         console.log(error.response.data);
@@ -48,56 +48,71 @@ export default function ViewDetails() {
         setMsg(error.response.data);
       });
 
-      RecruiterService.get(location.state.recruiterEmail).then((response)=>{
-     
-        setRecruiter(response.data)
-      }).catch((error)=>{
-        console.log(error.response.data)
+    RecruiterService.get(location.state.recruiterEmail)
+      .then((response) => {
+        setRecruiter(response.data);
       })
+      .catch((error) => {
+        console.log(error.response.data);
+      });
     return () => {};
   }, []);
 
-  const onAccept = (applicant) =>{
-    let status = "accepted"
-      RecruiterService.setStatus(recruiterEmail,jobId,status,applicant).then((response)=>{
-        setShow(false)
-        setShowMesg(true)
-        setMessage("You have Scuccessfully Accepeted the Candidate,click on setup Interview ")
-        setAcceptShow(true)
-      }).catch((error)=>{
-        setShow(false)
-        setShowMesg(true)
-        setMessage(error.response.data)
-        setAcceptShow(false)  
+  const onAccept = (applicant) => {
+    let status = "accepted";
+    RecruiterService.setStatus(recruiterEmail, jobId, status, applicant)
+      .then((response) => {
+        setShow(false);
+        setShowMesg(true);
+        setMessage(
+          "You have Scuccessfully Accepeted the Candidate,click on setup Interview "
+        );
+        setAcceptShow(true);
       })
-      
-    }
-    const onReject = (applicant) =>{
-      let status = "rejected"
-      RecruiterService.setStatus(recruiterEmail,jobId,status,applicant).then((response)=>{
-      setShow(false)
-      setShowMesg(true)
-      setMessage("Rejected, Check with  another candidate   NOTE: An automated email has been sent to applicant")
-    }).catch((error)=>{
-      setShowMesg(true)
-      setMessage(error.response.data)
-    })
-  }
-
-
-    const onCallForInterview = (applicant) => {
-      navigate("/RecruiterDash/CallForInterview", {
-        state: {applicantName : applicant.name,
-          applicantEmail:applicant.applicantEmail,
-          jobTitle:jobTitle,
-          recruiterName:recruiter.name,
-          recruiterEmail:recruiter.recruiterEmail,
-          companyName:recruiter.companyName,
-          companyAddress:recruiter.companyAddress,
-          companyContactNumber:recruiter.companyContactNumber
-        },
+      .catch((error) => {
+        setShow(false);
+        setShowMesg(true);
+        setMessage(error.response.data);
+        setAcceptShow(false);
       });
-    }
+  };
+  const onReject = (applicant) => {
+    let status = "rejected";
+    setLoading(true)
+    RecruiterService.setStatus(recruiterEmail, jobId, status, applicant)
+    .then((response) => {
+      setShow(false);
+      setLoading(false)
+      setShowMesg(true);
+      setMessage(
+        "Rejected, Check with  another candidate   NOTE: An automated email has been sent to applicant"
+        );
+      })
+      .catch((error) => {
+        setLoading(false)
+        setShowMesg(true);
+        setMessage(error.response.data);
+      });
+  };
+
+  const setMyApplicant = (applicant, key) => {
+    setApplicant(applicant);
+  };
+
+  const onCallForInterview = (applicant) => {
+    navigate("/RecruiterDash/CallForInterview", {
+      state: {
+        applicantName: applicant.name,
+        applicantEmail: applicant.applicantEmail,
+        jobTitle: jobTitle,
+        recruiterName: recruiter.name,
+        recruiterEmail: recruiter.recruiterEmail,
+        companyName: recruiter.companyName,
+        companyAddress: recruiter.companyAddress,
+        companyContactNumber: recruiter.companyContactNumber,
+      },
+    });
+  };
   return (
     <div>
       <RecruiterDash />
@@ -113,8 +128,8 @@ export default function ViewDetails() {
           </section>
 
           {isShow && <h6 className="text-center"> * {msg} * </h6>}
-
-          {myApplicants.map((applicant, key) => {
+          {loading && <Spinner/>}
+          {!loading && myApplicants.map((applicant, key) => {
             return (
               <Accordion key={key}>
                 <AccordionSummary
@@ -241,34 +256,99 @@ export default function ViewDetails() {
                     {show && (
                       <div className="btn-toolbar mt-3">
                         <button
-                            type="button"
-                            className="btn btn-primary me-3"
-                            onClick={() => onAccept(applicant,key)}
-                          >
-                            Accept
+                          type="button"
+                          className="btn btn-primary me-3"
+                          onClick={() => onAccept(applicant, key)}
+                        >
+                          Accept
                         </button>
                         <button
-                            type="button"
-                            className="btn btn-secondary me-3"
-                            onClick={() => onReject(applicant,key)}
-                          >
-                            Reject
+                          type="button"
+                          className="btn btn-secondary me-3"
+                          data-bs-toggle="modal"
+                          data-bs-target="#staticBackdrop"
+                          onClick={() => setMyApplicant(applicant)}
+                        >
+                          Reject
                         </button>
                       </div>
-                     )} 
-                     {showMesg && ( <><h6> {message}</h6><br /></>)}
-                     {acceptShow && ( <>      <button
-                            type="button"
-                            className="btn btn-primary me-3"
-                            onClick={() => onCallForInterview(applicant)}
-                          >
-                            Setup Interview
-                        </button>  </>)}
+                    )}
+                    {showMesg && (
+                      <>
+                        <h6> {message}</h6>
+                        <br />
+                      </>
+                    )}
+                    {acceptShow && (
+                      <>
+                        {" "}
+                        <button
+                          type="button"
+                          className="btn btn-primary me-3"
+                          onClick={() => onCallForInterview(applicant)}
+                        >
+                          Setup Interview
+                        </button>{" "}
+                      </>
+                    )}
                   </Typography>
                 </AccordionDetails>
               </Accordion>
             );
           })}
+        </div>
+        <div
+          className="modal fade"
+          id="staticBackdrop"
+          data-bs-backdrop="static"
+          data-bs-keyboard="false"
+          tabIndex="-1"
+          aria-labelledby="staticBackdropLabel"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="staticBackdropLabel">
+                  Are you sure?
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </div>
+              <div className="modal-body">
+                {" "}
+                Do you want to reject:<b> {applicant.name} </b> for JOB:{" "}
+                <b> {jobTitle} </b> <br />{" "}
+                {showMesg && (
+                      <>
+                        <h6 className="text-danger"> {message}</h6>
+                        
+                      </>
+                    )}
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+               
+                  onClick={() => onReject(applicant)}
+                >
+                  Reject
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

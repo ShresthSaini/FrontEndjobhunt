@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import ApplicantDash from "./ApplicantDash";
-import ApplicantService from "../services/ApplicantService";
+import ApplicantService from "../../services/ApplicantService";
 
 export default function AppliedJobsAndStatus() {
   const location = useLocation();
@@ -150,7 +150,7 @@ export default function AppliedJobsAndStatus() {
                   ></button>
                 </div>
                 <div className="modal-body">
-                  <div class="form-outline">
+                  <div className="form-outline">
                     <textarea
                       className="form-control"
                       id="textAreaExample1"

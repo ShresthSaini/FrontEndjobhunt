@@ -6,7 +6,7 @@ import { IconContext } from "react-icons";
 import "../ApplicantDash/AppDash.css";
 import LoginService from "../../services/LoginService";
 import { useCookies } from "react-cookie";
-import AdminService from "../services/AdminService"
+import AdminService from "../../services/AdminService"
 
 export default function AdminDash() {
   const [cookie, setCookie, removeCookie] = useCookies();

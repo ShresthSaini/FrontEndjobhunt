@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import RecruiterService from "../../services/RecruiterService";
 import RecruiterDash from "./RecruiterDash";
-import { Modal, Button } from "react-bootstrap";
+
 import {
   Accordion,
   AccordionSummary,
@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import * as FcIcons from "react-icons/fc";
+import AcceptedCand from "./AcceptedCand";
 
 export default function GetPostedJobs() {
   const [success, setSuccess] = useState(false);
@@ -97,6 +98,14 @@ export default function GetPostedJobs() {
     });
   };
 
+  const onAcceptCandButton = (item) => {
+      navigate("/RecruiterDash/GetPostedJobs/AcceptedCand", {
+      state: {jobId:item.jobId, jobTitle: item.jobTitle, recruiterEmail: rEmail },
+    });
+
+    // return <AcceptedCand jobTitle = {item.jobTitle}/>
+  };
+
   const onEditButton = (item) => {
     setJobDetails(item);
   };
@@ -113,6 +122,8 @@ export default function GetPostedJobs() {
         setMsg(error.response.data);
       });
   };
+
+
 
   return (
     <>
@@ -172,6 +183,14 @@ export default function GetPostedJobs() {
                           onClick={() => onEditButton(item)}
                         >
                           Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-primary me-3"
+                          onClick={() => onAcceptCandButton(item)}
+                          // onClick={() => <AcceptedCand jobTitle = {item.jobTitle}/>}
+                        >
+                          Accepted Candidates
                         </button>
                         {/* <button
                           type="button"

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {  useLocation } from "react-router-dom";
 import RecruiterDash from "./RecruiterDash";
-import AdminService from "../services/AdminService";
+import AdminService from "../../services/AdminService";
 
 export default function AppContactUs() {
   document.title = "ContactUs";

@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import RecruiterService from "../../services/RecruiterService";
-import ApplicantService from "../../services/ApplicantService";
-import AdminDash from "./AdminDash";
 
-export default function AdminApplicants() {
-  document.title = "Admin";
-  const navigate = useNavigate();
-  const [resume, setResume] = useState([]);
+import React, { useState, useEffect } from "react";
+import {useLocation } from "react-router-dom";
+import RecruiterService from "../../services/RecruiterService";
+import RecruiterDash from "./RecruiterDash";
+
+export default function AcceptedCand() {
+  const location = useLocation();
+  const [recruiterEmail , setRecuiterEmail] = useState();
+  const [jobTitle, setJobTitle] = useState();
+  const [jobId, setJobId] = useState();
   const [show, setShow] = useState(false);
+  const [msg, setMsg] = useState("");
   const [myApplicants, setMyApplicants] = useState([
     {
       name: "",
@@ -40,6 +42,10 @@ export default function AdminApplicants() {
     },
   ]);
 
+  const viewDetails = (applicant) => {
+    setMyApplicantsView(applicant);
+  };
+
   const changeHandleAppDetails = (e) => {
     setMyApplicantsView((prevData) => ({
       ...prevData,
@@ -47,53 +53,45 @@ export default function AdminApplicants() {
     }));
   };
 
-  useEffect(() => {
-    RecruiterService.getAllApplicants()
-      .then((response) => {
-        setMyApplicants(response.data);
-      })
-      .catch((error) => {
-        navigate("/login");
-      });
-    return () => {};
-  }, []);
+useEffect(() => {
+  setJobTitle(location.state.jobTitle);
+  setRecuiterEmail(location.state.recruiterEmail)
+  setJobId(location.state.jobId)
 
-  const viewDetails = (applicant) => {
-    setMyApplicantsView(applicant);
-  };
+  RecruiterService.getAcceptedApplicants(location.state.jobId).then((response)=>{
+    if (response.data.length == 0) {
+      setShow(true);
+      setMsg("You haven't accepted any Applicant yet");
+    }
+    setMyApplicants(response.data);
+  }).catch((error)=>{
+    console.log(error.response.data)
+  })
 
-  const viewResume = (applicantEmail) => {
-    const data = ApplicantService.getResume(applicantEmail)
-      .then((response) => {
-        setResume(response.data);
-        setShow(true);
-      })
-      .catch((error) => {
-        console.log(error.response.data);
-      });
-  };
+  return () => {
+    
+  }
+}, [])
+
+
 
   return (
-    <div>
-      <AdminDash />
-      <div className="container border">
-        <div
-          className="card-body "
-          style={{ padding: "1rem 5rem", marginLeft: "65px" }}
-        >
-          <section className="mb-5 ">
-            <h2 className="h1-responsive font-weight-bold text-center my-4">
-              Applicants
-            </h2>
-          </section>
-          {/* <iframe
-            src={`data:application/pdf;base64,${resume.resume}`}
-            frameBorder="0"
-            allowFullScreen
-            webkitallowfullscreen
-            mozallowfullscreen
-          ></iframe> */}
-          <div className="d-flex justify-content-evenly">
+    <>
+      <div>
+        <RecruiterDash />
+        <div className="container">
+          <div
+            className="card-body"
+            style={{ padding: "1rem 5rem", marginLeft: "65px" }}
+          >
+
+            <section className="mb-4">
+              <h3 className="h1-responsive font-weight-bold text-center my-4">
+                Accepted Candidates for Job:{jobTitle}
+              </h3>
+
+              {show && <h5 className="text-center"> *{msg}</h5>}
+            </section>
             {myApplicants.map((applicant, key) => (
               <div
                 className="card text-dark bg-light mb-3 "
@@ -108,15 +106,15 @@ export default function AdminApplicants() {
                     <ul className="list-group list-group-flush" key={key}>
                       <li className="list-group-item">
                         {" "}
-                        <b> Education: </b> {applicant.education}{" "}
+                        <b> Education: </b> &nbsp;  {applicant.education}{" "}
+                      </li>
+                      <li className="list-group-item" style={{fontSize:"14px"}}>
+                        {" "}
+                        <b> Institute: </b> &nbsp; {applicant.instituteName}{" "}
                       </li>
                       <li className="list-group-item">
                         {" "}
-                        <b> Institute: </b> {applicant.instituteName}{" "}
-                      </li>
-                      <li className="list-group-item">
-                        {" "}
-                        <b> End Year: </b> {applicant.endYear}{" "}
+                        <b> End Year: </b> &nbsp; {applicant.endYear}{" "}
                       </li>
                     </ul>
                   </div>
@@ -130,22 +128,12 @@ export default function AdminApplicants() {
                     >
                       View Details
                     </button>
-                    &nbsp; &nbsp;
-                    {/* <button
-                      type="button"
-                      className="btn btn-primary"
-                      data-bs-toggle="modal"
-                      data-bs-target="#exampleModal2"
-                      onClick={() => viewResume(applicant.applicantEmail)}
-                    >
-                      Resume
-                    </button> */}
                   </div>
                 </div>
               </div>
             ))}
-          </div>
-          <div
+
+<div
             className="modal fade"
             id="exampleModal"
             tabIndex="-1"
@@ -199,11 +187,12 @@ export default function AdminApplicants() {
                   </div>
                   <div className="row mt-2 align-items-center">
                     <div className="col-auto">
-                      <label htmlFor="phoneNumber"> Number: </label>
+                      <label htmlFor="phoneNumber">  Number: </label>
                     </div>
                     <div className="col-sm-6">
                       <input
                         type="borderless"
+                        
                         name="phoneNumber"
                         id="phoneNumber"
                         onChange={changeHandleAppDetails}
@@ -219,6 +208,7 @@ export default function AdminApplicants() {
                     <div className="col-sm-6">
                       <input
                         type="borderless"
+                        
                         name="gender"
                         id="gender"
                         onChange={changeHandleAppDetails}
@@ -234,6 +224,7 @@ export default function AdminApplicants() {
                     <div className="col-sm-6">
                       <input
                         type="borderless"
+                        
                         name="education"
                         id="education"
                         onChange={changeHandleAppDetails}
@@ -249,6 +240,7 @@ export default function AdminApplicants() {
                     <div className="col-sm-6">
                       <input
                         type="borderless"
+                        
                         name="instituteName"
                         id="instituteName"
                         onChange={changeHandleAppDetails}
@@ -279,6 +271,7 @@ export default function AdminApplicants() {
                     <div className="col-sm-6">
                       <input
                         type="borderless"
+                        
                         name="endYear"
                         id="endYear"
                         onChange={changeHandleAppDetails}
@@ -294,6 +287,7 @@ export default function AdminApplicants() {
                     <div className="col-sm-6">
                       <input
                         type="borderless"
+                        
                         name="jobProfile"
                         id="jobProfile"
                         onChange={changeHandleAppDetails}
@@ -309,6 +303,7 @@ export default function AdminApplicants() {
                     <div className="col-sm-6">
                       <input
                         type="borderless"
+                        
                         name="numOfExp"
                         id="experience"
                         onChange={changeHandleAppDetails}
@@ -330,49 +325,9 @@ export default function AdminApplicants() {
               </div>
             </div>
           </div>
-          <div
-            className="modal fade"
-            id="exampleModal2"
-            tabIndex="-1"
-            aria-labelledby="exampleModalLabel"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog  modal-dialog-scrollable ">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title" id="exampleModalLabel">
-                    Modal title
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  ></button>
-                </div>
-                <div className="modal-body">
-                  <iframe
-                    src={`data:application/pdf;base64,${resume.resume}`}
-                    frameBorder="0"
-                    allowFullScreen="true"
-                    webkitallowfullscreen="true"
-                    mozallowfullscreen="true"
-                  ></iframe>
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

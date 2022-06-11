@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ApplicantDash from "./ApplicantDash";
-import AdminService from "../services/AdminService";
+import AdminService from "../../services/AdminService";
 
 export default function AppContactUs() {
   document.title = "ContactUs";

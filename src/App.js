@@ -16,6 +16,7 @@ import GetPostedJobs from "./components/RecruiterDash/GetPostedJobs";
 import CallForInterview from "./components/RecruiterDash/CallForInterview";
 import RecContactUs from "./components/RecruiterDash/RecContactUs";
 import RecDeleteAccount from "./components/RecruiterDash/RecDeleteAccount";
+import AcceptedCand from "./components/RecruiterDash/AcceptedCand";
 import ApplicantDash from "./components/ApplicantDash/ApplicantDash";
 import AppPersonalDetails from "./components/ApplicantDash/AppPersonalDetails";
 import AppContactUs from "./components/ApplicantDash/AppContactUs";
@@ -101,6 +102,10 @@ function App() {
           <Route
             path="/RecruiterDash/GetPostedJobs/ViewDetails"
             element={<ViewDetails />}
+          />
+          <Route
+            path="/RecruiterDash/GetPostedJobs/AcceptedCand"
+            element={<AcceptedCand/>}
           />
           <Route
             path="/RecruiterDash/CallForInterview"

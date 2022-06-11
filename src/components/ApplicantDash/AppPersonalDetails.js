@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link,useLocation } from "react-router-dom";
 import ApplicantDash from "./ApplicantDash";
-import ApplicantService from "../services/ApplicantService";
+import ApplicantService from "../../services/ApplicantService";
 
 export default function AppPersonalDetails() {
 

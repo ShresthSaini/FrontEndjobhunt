@@ -2,9 +2,11 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import RecruiterService from "../../services/RecruiterService";
 import RecruiterDash from "./RecruiterDash";
+import Spinner from "../Spinner";
 
 export default function CallForInterview() {
   
+  const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
   const [msg, setMsg] = useState();
   const location = useLocation();
@@ -49,12 +51,15 @@ export default function CallForInterview() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    setLoading(true)
     const data = RecruiterService.callForInterview(details)
-      .then((response) => {
-        setMsg(response.data);
-        setShow(true)
-      })
-      .catch((error) => {
+    .then((response) => {
+      setLoading(false)
+      setMsg(response.data);
+      setShow(true)
+    })
+    .catch((error) => {
+      setLoading(false)
         setShow(true)
         setShow(error.response.data)
       });
@@ -62,7 +67,8 @@ export default function CallForInterview() {
   return (
     <div>
       <RecruiterDash />
-      <div className="container border">
+      {loading && <Spinner/>}
+      {!loading && <div className="container border">
         
           <div className="row justify-content-center">
             <div className="col-md-8">
@@ -324,15 +330,7 @@ export default function CallForInterview() {
                       >
                         Send
                       </button>
-                      {/* <Link to="/RecruiterDash/GetPostedJobs">
-                        <button
-                          type="cancel"
-                          className="btn btn-danger col-4  "
-                          value="cancel"
-                        >
-                          Cancel
-                        </button>
-                      </Link> */}
+   
                     </div>
                     {show && <h6 className="text-center mt-3"> {msg} </h6>}
                   </form>
@@ -340,7 +338,7 @@ export default function CallForInterview() {
               </div>
             </div>
           </div>
-        </div>
+        </div>}
       </div>
    
   );

@@ -13,6 +13,10 @@ class RecruiterService {
     return http.get(`/Recruiter/getAllApplicants`);
   }
 
+  getAcceptedApplicants(id) {
+    return http.get(`/Recruiter/acceptedApplicants/${id}`);
+  }
+
   getAppliedApplicants(id) {
     return http.get(`/Recruiter/getAppliedApplicants/${id}`);
   }

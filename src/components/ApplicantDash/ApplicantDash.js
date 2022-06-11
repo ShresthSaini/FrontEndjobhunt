@@ -6,7 +6,7 @@ import { IconContext } from "react-icons";
 import "./AppDash.css";
 import LoginService from "../../services/LoginService";
 import { useCookies } from "react-cookie";
-import ApplicantService from "../services/ApplicantService";
+import ApplicantService from "../../services/ApplicantService";
 
 export default function ApplicantDash() {
   document.title = "Applicant";

@@ -1,17 +1,20 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import LoginService from "../services/LoginService";
 import Navbar from "./Navbar";
 import "./Login.css";
-import { useCookies } from "react-cookie";
+// import { useCookies } from "react-cookie";
+import Spinner from "./Spinner"
 
 export default function Login() {
   document.title = "Login";
 
-  const [cookie, setCookie] = useCookies();
+  // const [cookie, setCookie] = useCookies();
   const [failureMsg, setFailureMsg] = useState("");
   const [msg, setMsg] = useState("");
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [email, setEmail] = useState();
   const [loginFailure, setLoginFailure] = useState(false);
   const nav = useNavigate();
@@ -30,18 +33,21 @@ export default function Login() {
   const handleSubmit = (event) => {
     event.preventDefault();
     // alert(`you entered values: ${JSON.stringify(inputs)}`);
+    setLoading(true)
+
     var data = LoginService.login(inputs)
-      .then((response) => {
-        setLoginFailure(false);
+    .then((response) => {
+      setLoginFailure(false);
+      setLoading(false)
 
-        if (response.data[0] === "Applicant" && response.data[1] === true) {
-          // setCookie(response.data[0], response.data[2]);
-          localStorage.setItem(response.data[0],response.data[2],{encrypt:true});
-
-          nav("/ApplicantDash/AppHome", { state: { email: inputs.email } });
-        } else if (
-          response.data[0] === "Recruiter" &&
-          response.data[1] === true
+      if (response.data[0] === "Applicant" && response.data[1] === true) {
+        // setCookie(response.data[0], response.data[2]);
+        localStorage.setItem(response.data[0],response.data[2],{encrypt:true});
+        
+        nav("/ApplicantDash/AppHome", { state: { email: inputs.email } });
+      } else if (
+        response.data[0] === "Recruiter" &&
+        response.data[1] === true
         ) {
           // setCookie(response.data[0], response.data[2]);
           localStorage.setItem(response.data[0],response.data[2],{encrypt:true});
@@ -55,14 +61,15 @@ export default function Login() {
       })
       .catch((error) => {
         setLoginFailure(true);
-
+        setLoading(false)
         setFailureMsg("Login Failed");
-      });
-  };
 
-  const forgetPassword = (event) => {
-    event.preventDefault();
-    const data = LoginService.forgetPassword(email)
+      });
+    };
+    
+    const forgetPassword = (event) => {
+      event.preventDefault();
+      const data = LoginService.forgetPassword(email)
       .then((response) => {
         setMsg(response.data);
         setShow(true);
@@ -79,7 +86,8 @@ export default function Login() {
         <section className="vh-100">
           <div className="container">
             <Navbar />
-            <div className="row d-flex justify-content-center align-items-center ">
+            {loading && <Spinner/>}
+           { !loading && <div className="row d-flex justify-content-center align-items-center ">
               <div className="col-md-9 col-lg-6 col-xl-5">
                 <img src="/login.jpg" className="img-fluid" alt="Sample" />
               </div>
@@ -193,7 +201,7 @@ export default function Login() {
                   </div>
                 </form>
               </div>
-            </div>
+            </div>}
           </div>
         </section>
       </div>
