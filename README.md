@@ -1,4 +1,4 @@
-# Deployed on hereku, you can visit the following link for demo
+# Deployed on heroku, you can visit the following link for demo
 
 https://frontend-jobhunt.herokuapp.com/
 
