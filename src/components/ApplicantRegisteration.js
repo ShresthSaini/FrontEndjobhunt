@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import applicantService from "../services/ApplicantService";
 import "./Reg.css";
 import Select from "react-select";
+import { Spinner } from "react-bootstrap";
 
 export default function ApplicantRegisteration() {
   const skillsList = [
@@ -71,11 +72,8 @@ export default function ApplicantRegisteration() {
   const [error, setError] = useState(false);
   const [show, setShow] = useState(false);
   const [msg, setMsg] = useState();
+  const [spin, setSpin] = useState(false);
   const [selectedValue, setSelectedValue] = useState({ label: "", value: "" });
-  const [selectedSkillValue, setSkillSelectedValue] = useState({
-    label: "",
-    value: "",
-  });
   const [skill, setSkill] = useState("");
   const [skills, setSkills] = useState([]);
   const [isShowPro, setIsShowPro] = useState(false);
@@ -128,16 +126,17 @@ export default function ApplicantRegisteration() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
     setFormErrors(validate(newInputs));
     setIsSubmit(true);
   };
 
   useEffect(() => {
     if (Object.keys(formErrors).length === 0 && isSubmit) {
-      const data = applicantService
+      setSpin(true);
+      applicantService
         .create(newInputs)
         .then((response) => {
+          setSpin(false);
           setShow(true);
           setMsg(response.data);
           setInputs.name("");
@@ -153,6 +152,7 @@ export default function ApplicantRegisteration() {
           setInputs.numOfExp("");
         })
         .catch((error) => {
+          setSpin(false);
           setShow(true);
           setMsg(error.response.data);
         });
@@ -343,9 +343,9 @@ export default function ApplicantRegisteration() {
                         onChange={setSelectedValue}
                       />
                     </div>
-                  <h6 className="text-center text-danger fw-bolder">
-                    {formErrors.education}
-                  </h6>
+                    <h6 className="text-center text-danger fw-bolder">
+                      {formErrors.education}
+                    </h6>
                   </div>
 
                   <div className="col-sm-6">
@@ -403,10 +403,10 @@ export default function ApplicantRegisteration() {
                       required
                       title="Enter your end year"
                     />
-                <h6 className="text-center text-danger fw-bolder">
-                  {formErrors.endYear}
-                  {formErrors.startYear}
-                </h6>
+                    <h6 className="text-center text-danger fw-bolder">
+                      {formErrors.endYear}
+                      {formErrors.startYear}
+                    </h6>
                   </div>
                 </div>
                 <div className="col-sm-6 ">
@@ -519,7 +519,13 @@ export default function ApplicantRegisteration() {
                 </button>
               </div>
             </form>
-            {show && <h6 className=" text-center mt-4"> {msg} </h6>}
+            {spin ? (
+              <div className="text-center mt-2">
+                <Spinner animation="border" />
+              </div>
+            ) : (
+              show && <h6 className=" text-center mt-4"> {msg} </h6>
+            )}
           </div>
         </div>
       </div>

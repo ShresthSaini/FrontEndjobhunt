@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import recruiterService from "../services/RecruiterService";
 import "./Reg.css";
 import Navbar from "./Navbar";
-import { useForm } from "react-hook-form";
+import { Spinner } from "react-bootstrap";
 
 export default function RecruiterRegistration() {
   document.title = "Recruiter Registration";
   const [isSubmit, setIsSubmit] = useState(false);
   const [show, setShow] = useState(false);
   const [msg, setMsg] = useState();
+  const [spin, setSpin] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
   const [inputs, setInputs] = useState({
@@ -31,15 +32,17 @@ export default function RecruiterRegistration() {
   };
 
   useEffect(() => {
-    console.log(Object.keys(formErrors).length);
     if (Object.keys(formErrors).length === 0 && isSubmit) {
-      const data = recruiterService
+      setSpin(true)
+      recruiterService
         .create(inputs)
         .then((response) => {
+          setSpin(false);
           setShow(true);
           setMsg(response.data);
         })
         .catch((error) => {
+          setSpin(false);
           setShow(true);
           setMsg(error.response.data);
         });
@@ -51,6 +54,7 @@ export default function RecruiterRegistration() {
     event.preventDefault();
     setFormErrors(validate(inputs));
     setIsSubmit(true);
+
   };
 
   const validate = (values) => {
@@ -296,9 +300,15 @@ export default function RecruiterRegistration() {
                     Submit
                   </button>
                 </div>
-
+                <br />
               </div>
-                {show && <h6 className=" text-center mt-4"> {msg} </h6>}
+              {spin ? (
+                <div className="text-center mt-2">
+                  <Spinner animation="border" />
+                </div>
+              ) : (
+                show && <h6 className=" text-center mt-4"> {msg} </h6>
+              )}
             </form>
           </div>
         </div>
